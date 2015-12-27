@@ -153,7 +153,7 @@ trait DurableContext {
                 }
             }
         } else
-            Future.successful()
+        Future.successful(())
     }
 
     private def groupByStorage[T](iterable: Iterable[T])(f: T => Class[_ <: BaseEntity]) =
@@ -387,7 +387,7 @@ trait DurableContext {
                             }
                     }
             case Nil =>
-                Future.successful()
+                Future.successful(())
         }
     }
 

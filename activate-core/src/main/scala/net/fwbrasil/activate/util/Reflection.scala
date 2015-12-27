@@ -121,7 +121,7 @@ object Reflection {
     def getAllImplementorsNames(classpathHints: List[Any], interfaceClass: Class[_]) = {
         val hints = reflectionsHints(classpathHints ++ List(interfaceClass))
         val reflections = reflectionsFor(hints)
-        val subtypes = reflections.getStore.getSubTypesOf(interfaceClass.getName).toArray
+        val subtypes = reflections.getSubTypesOf(interfaceClass.getClass).toArray
         Set(subtypes: _*).asInstanceOf[Set[String]]
     }
 

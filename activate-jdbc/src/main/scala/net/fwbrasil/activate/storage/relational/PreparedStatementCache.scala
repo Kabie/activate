@@ -9,7 +9,7 @@ import net.fwbrasil.activate.util.IdentityHashMap
 import scala.collection.concurrent.TrieMap
 import com.google.common.collect.MapMaker
 import net.fwbrasil.activate.util.ConcurrentCache
-import com.zaxxer.hikari.proxy.ConnectionProxy
+import com.zaxxer.hikari.pool.ProxyConnection
 
 class PreparedStatementCache {
 
@@ -36,7 +36,7 @@ class PreparedStatementCache {
 
     private def realConnection(connection: Connection) =
         connection match {
-            case conn: ConnectionProxy =>
+            case conn: ProxyConnection =>
                 conn.unwrap(classOf[Connection])
             case conn =>
                 conn

@@ -183,7 +183,7 @@ trait SprayJsonContext extends JsonContext[JsObject] {
     }
 
     def updateEntityFromJson[E <: BaseEntity: Manifest](json: String, entity: E) = {
-        updateEntityFromJson(json.asJson.asJsObject, entity)
+        updateEntityFromJson(json.parseJson.asJsObject, entity)
         entity
     }
 
@@ -208,7 +208,7 @@ trait SprayJsonContext extends JsonContext[JsObject] {
     }
 
     def createEntityFromJson[E <: BaseEntity: Manifest](json: String): E =
-        createEntityFromJson[E](json.asJson.asJsObject)
+        createEntityFromJson[E](json.parseJson.asJsObject)
 
     def createEntityFromJson[E <: BaseEntity: Manifest](json: JsObject): E = {
         val entityClass = erasureOf[E]
@@ -229,7 +229,7 @@ trait SprayJsonContext extends JsonContext[JsObject] {
     }
 
     def createOrUpdateEntityFromJson[E <: BaseEntity: Manifest](json: String): E =
-        createOrUpdateEntityFromJson[E](json.asJson.asJsObject)
+        createOrUpdateEntityFromJson[E](json.parseJson.asJsObject)
 
     def createOrUpdateEntityFromJson[E <: BaseEntity: Manifest](json: JsObject) = {
         json.fields.collect {
@@ -242,10 +242,10 @@ trait SprayJsonContext extends JsonContext[JsObject] {
     }
 
     def updateEntityFromJson[E <: BaseEntity: Manifest](json: String, id: E#ID): E =
-        updateEntityFromJson[E](json.asJson.asJsObject, id)
+        updateEntityFromJson[E](json.parseJson.asJsObject, id)
 
     def updateEntityFromJson[E <: BaseEntity: Manifest](json: String): E =
-        updateEntityFromJson[E](json.asJson.asJsObject)
+        updateEntityFromJson[E](json.parseJson.asJsObject)
 
     def updateEntityFromJson[E <: BaseEntity: Manifest](jsValue: JsObject) = {
         jsValue.fields.collect {

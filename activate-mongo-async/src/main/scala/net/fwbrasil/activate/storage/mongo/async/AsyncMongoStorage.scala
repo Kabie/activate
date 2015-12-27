@@ -14,8 +14,9 @@ import com.mongodb.BasicDBObject
 import net.fwbrasil.activate.storage.mongo.mongoIdiom
 import reactivemongo.bson._
 import reactivemongo.api._
-import reactivemongo.api.collections.default._
-import reactivemongo.api.collections.default.BSONGenericHandlers._
+import reactivemongo.api.collections.bson._
+import reactivemongo.api.commands._
+// import reactivemongo.api.collections.default.BSONGenericHandlers._
 import scala.concurrent.Future
 import net.fwbrasil.activate.storage.TransactionHandle
 import net.fwbrasil.activate.statement.mass.MassModificationStatement
@@ -23,7 +24,6 @@ import scala.concurrent.ExecutionContext
 import net.fwbrasil.activate.statement.mass.MassUpdateStatement
 import net.fwbrasil.activate.statement.From
 import net.fwbrasil.activate.statement.mass.MassDeleteStatement
-import play.api.libs.iteratee.Enumerator
 import net.fwbrasil.activate.storage.marshalling.ModifyStorageAction
 import net.fwbrasil.activate.storage.marshalling.StorageRenameTable
 import net.fwbrasil.activate.storage.marshalling.StorageRemoveTable
@@ -72,7 +72,8 @@ trait AsyncMongoStorage extends MarshalStorage[DefaultDB] with DelayedInit {
     override def delayedInit(body: => Unit) = {
         body
         val driver = new MongoDriver
-        val conn = driver.connection(List(host + ":" + port), nbChannelsPerNode = maxConnections)
+        val options = new MongoConnectionOptions(nbChannelsPerNode = maxConnections)
+        val conn = driver.connection(List(host + ":" + port), options)
         if (authentication.isDefined) {
             val (user, password) = authentication.get
             await(conn.authenticate(db, user, password))
@@ -172,7 +173,7 @@ trait AsyncMongoStorage extends MarshalStorage[DefaultDB] with DelayedInit {
             else
                 ret
 
-        toQueryResult(query, sorted.cursor).map { result =>
+        toQueryResult(query, sorted.cursor[BSONDocument]).map { result =>
             mongoIdiom.transformResultToTheExpectedTypes[BSONDocument](
                 expectedTypes,
                 query.select.values,
@@ -228,7 +229,7 @@ trait AsyncMongoStorage extends MarshalStorage[DefaultDB] with DelayedInit {
 
     private def toQueryResult(query: Query[_], cursor: Cursor[BSONDocument]) = {
         implicit val ctx = executionContext
-        try query match {
+        query match {
             case q: LimitedOrderedQuery[_] =>
                 cursor.collect[List](q.limit)
             case other =>
@@ -255,9 +256,9 @@ trait AsyncMongoStorage extends MarshalStorage[DefaultDB] with DelayedInit {
         Future(mongoIdiom.toInsertMap(insertList)).flatMap { insertMap =>
             insertMap.keys.toList.foldLeft(Future()) { (future, entityClass) =>
                 future.flatMap { _ =>
-                    val inserts = insertMap(entityClass).toList.map(dbObject(_))
-                    val enumerator = Enumerator(inserts: _*)
-                    coll(entityClass).bulkInsert(enumerator).map { _ => }
+                    val collection = coll(entityClass)
+                    val inserts = insertMap(entityClass).toList.map(dbObject(_)).map(implicitly[collection.ImplicitlyDocumentProducer](_))
+                    collection.bulkInsert(false)(inserts: _*).map { _ => }
                 }
             }
         }

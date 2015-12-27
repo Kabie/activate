@@ -13,7 +13,7 @@ import scala.collection.mutable.{ Map => MutableMap }
 import net.fwbrasil.activate.util.Reflection
 import net.fwbrasil.activate.entity.id.EntityId
 import org.joda.time.Instant
-import org.joda.time.DateMidnight
+// import org.joda.time.DateMidnight
 import org.joda.time.DateTime
 
 abstract class EntityValue[V](val value: Option[V]) extends Serializable {
@@ -233,8 +233,8 @@ trait ValueContext {
         toDateEntityValueOption(Option(value))
     implicit def toJodaInstantEntityValue(value: Instant) =
         toJodaInstantEntityValueOption(Option(value))
-    implicit def toJodaDateMidnightEntityValue(value: DateMidnight) =
-        toJodaDateMidnightEntityValueOption(Option(value))
+    // implicit def toJodaDateMidnightEntityValue(value: DateMidnight) =
+    //     toJodaDateMidnightEntityValueOption(Option(value))
     implicit def toJodaDateTimeEntityValue(value: DateTime) =
         toJodaDateTimeEntityValueOption(Option(value))
     implicit def toCalendarEntityValue(value: java.util.Calendar) =
@@ -272,8 +272,8 @@ trait ValueContext {
         DateEntityValue(value)
     implicit def toJodaInstantEntityValueOption(value: Option[Instant]): JodaInstantEntityValue[Instant] =
         JodaInstantEntityValue(value)
-    implicit def toJodaDateMidnightEntityValueOption(value: Option[DateMidnight]): JodaInstantEntityValue[DateMidnight] =
-        JodaInstantEntityValue(value)
+    // implicit def toJodaDateMidnightEntityValueOption(value: Option[DateMidnight]): JodaInstantEntityValue[DateMidnight] =
+    //     JodaInstantEntityValue(value)
     implicit def toJodaDateTimeEntityValueOption(value: Option[DateTime]): JodaInstantEntityValue[DateTime] =
         JodaInstantEntityValue(value)
     implicit def toCalendarEntityValueOption(value: Option[java.util.Calendar]) =

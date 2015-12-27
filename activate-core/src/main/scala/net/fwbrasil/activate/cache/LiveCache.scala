@@ -84,12 +84,12 @@ class LiveCache(
 
     val cache =
         EntityHelper.allConcreteEntityClasses
-            .map((_, cacheType.mapMaker.makeMap[Any, BaseEntity]))
+            .map((_, cacheType.cacheBuilder.build[AnyRef, BaseEntity]))
             .toMap
 
     def reinitialize =
         logInfo("live cache reinitialize") {
-            cache.values.foreach(_.clear)
+            cache.values.foreach(_.cleanUp)
             customCaches.foreach(_.clear)
         }
 
